@@ -15,7 +15,7 @@ The application performs mouse clicks at specified screen coordinates with a con
 - No reconfiguration required on restart
 
 ## Build
-To build the executable version, only one external tool is required: PyInstaller.
+To build the executable version, only one external tool is required: PyInstaller 6.18.0.
 
 bash:
 pyinstaller --onefile --noconsole --name AutoClicker gui.py
