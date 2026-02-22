@@ -133,6 +133,35 @@ def set_status_running(is_running: bool):
         status_label.config(text="Status: working", bg="green")
     else:
         status_label.config(text="Status: stopped", bg="red")
+        
+def show_status_popup(is_running: bool):
+    message = "Статус активирован" if is_running else "Статус деактивирован"
+    popup_color = "#16a34a" if is_running else "#dc2626"
+    popup_width = 240
+    popup_height = 64
+
+    popup = tk.Toplevel()
+    popup.overrideredirect(True)
+    popup.attributes("-topmost", True)
+
+    label = tk.Label(
+        popup,
+        text=message,
+        bg=popup_color,
+        fg="white",
+        relief="solid",
+        borderwidth=1,
+        font=("Segoe UI", 10, "bold"),
+    )
+    label.place(x=0, y=0, width=popup_width, height=popup_height)
+
+    margin = 16
+    x = popup.winfo_screenwidth() - popup_width - margin
+    y = popup.winfo_screenheight() - popup_height - margin
+    popup.geometry(f"{popup_width}x{popup_height}+{x}+{y}")
+    popup.lift()
+
+    popup.after(1000, popup.destroy)
 
 def mouse_watch():
     global mouse_watch_job
@@ -251,6 +280,7 @@ def autoclickstart():
         ac.arm(root, ClickX1, ClickY1, ClickX2, ClickY2, intervaltime, delay_ms=10000)
         flush_mouse_state()
         mouse_watch()
+        show_status_popup(True)
 
     elif code == -1:
         status_label.config(text="Status: stopped", bg="red")
@@ -263,11 +293,14 @@ def autoclickstart():
 
 def autoclickstop():
     global mouse_watch_job
+    was_running = ac.running
     ac.stop()
     set_status_running(False)
     if mouse_watch_job is not None:
         root.after_cancel(mouse_watch_job)
         mouse_watch_job = None
+    if was_running:
+        show_status_popup(False)
 
 def set_value(spin):
     spin.delete(0, "end")
@@ -336,3 +369,4 @@ stop_button.pack()
 
 root.protocol("WM_DELETE_WINDOW", on_close)
 root.mainloop()
+
